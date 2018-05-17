@@ -16,6 +16,11 @@ public class AirData {
     private static String stationURL = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/";
     private static String airDataURL = "http://api.gios.gov.pl/pjp-api/rest/data/getData/";
 
+    /**
+     * function gets jsonArray from url
+     * @param url with json data
+     * @return JSONArray of data
+     */
     private static JSONArray getJSON(String url) {
         JSONParser parser = new JSONParser();
         JSONArray a = null;
@@ -40,6 +45,11 @@ public class AirData {
         return a;
     }
 
+    /**
+     * function gets jsonObject from url
+     * @param url with json data
+     * @return JSONObject of data
+     */
     private static JSONObject getJSONObject(String url) {
         JSONParser parser = new JSONParser();
         JSONObject a = null;
@@ -80,6 +90,10 @@ public class AirData {
         return (HashMap<String, List<String>>) provinceMap;
     }
 
+    /**
+     * function takes data from GIOS API with Poland provinces and list of their stations
+     * @return map with key "province" and value with list of id`s from their stations
+     */
     private static Map<String, List<String>> getProvinceMap() {
         HashMap<String, String> stationMap = new HashMap<>();
         JSONArray a = getJSON(provinceURL);
@@ -95,6 +109,11 @@ public class AirData {
         return provinceMap;
     }
 
+    /**
+     * function gets data for given station from GIOS API
+     * @param stationNumber id of station
+     * @return map with key - "element name" and value - id of this element
+     */
     private static HashMap<String, String> getDataID(String stationNumber) {
         String airURL = stationURL+stationNumber;
         HashMap<String, String> stationAirData = new HashMap<>();
@@ -109,11 +128,11 @@ public class AirData {
     }
 
     private static String getValueFromURL(String index){
-        airDataURL = airDataURL+index;
+        index = airDataURL+index;
         String result = new String ();
         int i = 0;
 
-        JSONObject a = getJSONObject(airDataURL);
+        JSONObject a = getJSONObject(index);
 
         HashMap b = (HashMap) ((HashMap)a);
         String key = (String) b.get("key");
@@ -124,6 +143,9 @@ public class AirData {
         for (Object o : l) {
             if (i == 1)
                 break;
+            else if (((HashMap)o).get("value") == null) {
+                continue;
+            }
             result = (String) ((HashMap)o).get("value").toString();
             hm.put( key, ((HashMap)o).get("value"));
             i++;
@@ -131,31 +153,49 @@ public class AirData {
         return result;
     }
 
-    private static void getData(HashMap index) {
+    /**
+     *
+     * @param index
+     * @return
+     */
+    private static HashMap getData(HashMap index) {
         HashMap data = new HashMap();
         for (Object key : index.keySet()) {
             String keyStr = index.get(key).toString();
 
-            data.put(keyStr, getValueFromURL(keyStr) );
+            data.put(key.toString(), getValueFromURL(keyStr) );
         }
+        return data;
     }
 
+    /**
+     * function rewrites element id`s into their latest value from GIOS API
+     * @param provinceMap map of provinces with list of their parameters from every station
+     */
     private static void getAirData(HashMap<String, ArrayList> provinceMap){
         ArrayList<HashMap> listOfMaps = new ArrayList<>();
         for (Object key : provinceMap.keySet()){
             Object listOfData = provinceMap.get(key);
             for (int i = 0; i < ((ArrayList) listOfData).size(); i++) {
                 Object listOfIndex = ((ArrayList)listOfData).get(i);
-                getData((HashMap) listOfIndex);
-                }
+                listOfMaps.add(getData((HashMap) listOfIndex));
+            }
+            ArrayList<HashMap> tmp = (ArrayList)listOfMaps.clone();
+            provinceMap.put(key.toString(),tmp);
+            listOfMaps.clear();
         }
     }
 
-    private static  HashMap<String, ArrayList> getListOfDataFromProvinces(HashMap map){
+    /**
+     * function rewrites for every province in provinceMap list of station id`s into list of data from each of this stations
+     * @param provinceMap this is map of provinces with list of their stations
+     * @return new map, in which list of id`s is changed to list of data from every station
+     */
+    private static  HashMap<String, ArrayList> getListOfDataFromProvinces(HashMap provinceMap){
         ArrayList<HashMap> listOfMaps = new ArrayList<>();
         HashMap<String, ArrayList> provinceStations = new HashMap<>();
-        for (Object key : map.keySet()) {
-            Object listOfStations = map.get(key);
+        for (Object key : provinceMap.keySet()) {
+            Object listOfStations = provinceMap.get(key);
             for (int i = 0; i < ((ArrayList) listOfStations).size(); i++) {
                 listOfMaps.add(getDataID(((ArrayList) listOfStations).get(i).toString()));
             }
@@ -172,13 +212,10 @@ public class AirData {
 
     public static void main(String[] args) {
         HashMap m = new HashMap (getProvinceMap());
-        System.out.println(m.toString());
-        HashMap m2 = new HashMap((getDataID("761")));
-        System.out.println(m2.toString());
-
         HashMap m3 = getListOfDataFromProvinces(m);
         System.out.println(m3.toString());
         getAirData(m3);
+        System.out.println(m3.toString());
     }
 
 }
