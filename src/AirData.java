@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -74,6 +75,12 @@ public class AirData {
         return a;
     }
 
+    /**
+     * function makes list of unique provinces and then puts each of them as a key into provinceMap
+     * with list of stations as values
+     * @param stationMap unsorted map of every station and it`s province
+     * @return sorted map with key - "province" and value - list of stations
+     */
     private static HashMap<String, List<String>> sortByProvince(HashMap<String,String> stationMap){
         Set<String> provinceSet = new HashSet<>(stationMap.values());
         Map<String, List<String>> provinceMap = new HashMap<>();
@@ -127,6 +134,11 @@ public class AirData {
         return stationAirData;
     }
 
+    /**
+     * function gets the latest value of element form GIOS API
+     * @param index of element
+     * @return value of element
+     */
     private static String getValueFromURL(String index){
         index = airDataURL+index;
         String result = new String ();
@@ -154,9 +166,9 @@ public class AirData {
     }
 
     /**
-     *
-     * @param index
-     * @return
+     * function gets
+     * @param index map of elements and their id`s from GIOS API
+     * @return map where id of element is rewrote to it`s actual value (taken from API)
      */
     private static HashMap getData(HashMap index) {
         HashMap data = new HashMap();
@@ -206,8 +218,26 @@ public class AirData {
         return provinceStations;
     }
 
-    private static String sortByData(ArrayList<HashMap> listOfStations) {
-        return "fff";
+    private static void sortByElement(HashMap<String, ArrayList> listOfStations) {
+        ArrayList a = new ArrayList<>(listOfStations.values());
+        Set s = new HashSet();
+        ArrayList l;
+        HashMap<String, ArrayList> duplicates = new HashMap<>();
+        ArrayList duplicateValues = new ArrayList();
+        for (Object o : a) {
+            l = new ArrayList((ArrayList)o);
+            for (Object oo : l) {
+                HashMap hh = (HashMap)oo;
+                for (Object key : hh.keySet()) {
+                    if (!s.add(key.toString())) {
+                        duplicateValues.add(hh.get(key).toString());
+                        duplicates.put(key.toString(), duplicateValues);
+                    }
+                }
+            }
+            s.clear();
+        }
+
     }
 
     public static void main(String[] args) {
@@ -216,6 +246,8 @@ public class AirData {
         System.out.println(m3.toString());
         getAirData(m3);
         System.out.println(m3.toString());
+
+        sortByElement(m3);
     }
 
 }
