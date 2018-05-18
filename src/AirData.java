@@ -218,9 +218,30 @@ public class AirData {
         return provinceStations;
     }
 
-    private static void sortByElement(HashMap<String, ArrayList> listOfStations) {
+    private static HashMap<String, String> countAvg(HashMap<String, ArrayList> map){
+        ArrayList listOfValues;
+        HashMap newMap = new HashMap();
+        for (Object key : map.keySet()){
+            listOfValues = (ArrayList)map.get(key.toString());
+            double sum = 0;
+            String empty = new String("");
+            for (int i = 0; i < listOfValues.size(); i++){
+                String str = (String) listOfValues.get(i);
+                if (!str.equals(empty)) {
+                    sum += Double.parseDouble((String) listOfValues.get(i));
+                }
+            }
+            newMap.put(key.toString(),Math.round(sum/listOfValues.size()*100.0)/100.0);
+        }
+        return newMap;
+    }
+
+    private static  HashMap<String, HashMap> sortByElement(HashMap<String, ArrayList> listOfStations) {
         ArrayList a = new ArrayList<>(listOfStations.values());
+        HashMap<String, HashMap> newMap = new HashMap<>();
         Set s = new HashSet();
+        int count = 0;
+        ArrayList province = new ArrayList(listOfStations.keySet());
         ArrayList l;
         HashMap<String, ArrayList> duplicates = new HashMap<>();
         ArrayList duplicateValues = new ArrayList();
@@ -230,14 +251,28 @@ public class AirData {
                 HashMap hh = (HashMap)oo;
                 for (Object key : hh.keySet()) {
                     if (!s.add(key.toString())) {
-                        duplicateValues.add(hh.get(key).toString());
-                        duplicates.put(key.toString(), duplicateValues);
+                        if(hh.get(key)!="") {
+                            ArrayList al = (ArrayList) duplicates.get(key.toString()).clone();
+                            al.add(hh.get(key));
+                            duplicates.put(key.toString(), al);
+                        }
+                    } else {
+                        if(hh.get(key)!= "") {
+                            ArrayList tmp = new ArrayList();
+                            tmp.add(hh.get(key));
+                            duplicates.put(key.toString(), tmp);
+                        }
                     }
                 }
             }
+            System.out.println(duplicates.toString());
+            newMap.put(province.get(count).toString(),countAvg(duplicates));
+            count++;
             s.clear();
+            duplicates.clear();
         }
-
+        System.out.println("dd");
+        return newMap;
     }
 
     public static void main(String[] args) {
@@ -246,8 +281,7 @@ public class AirData {
         System.out.println(m3.toString());
         getAirData(m3);
         System.out.println(m3.toString());
-
-        sortByElement(m3);
+        HashMap newHM = sortByElement(m3);
     }
 
 }
