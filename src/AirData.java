@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -265,23 +264,36 @@ public class AirData {
                     }
                 }
             }
-            System.out.println(duplicates.toString());
             newMap.put(province.get(count).toString(),countAvg(duplicates));
             count++;
             s.clear();
             duplicates.clear();
         }
-        System.out.println("dd");
         return newMap;
     }
 
+    /**
+     * loop that takes data from API every 6 hours (4 times a day)
+     */
+    private static void timeLoop(){
+        try {
+            while (true) {
+                HashMap m = new HashMap (getProvinceMap());
+                HashMap m3 = getListOfDataFromProvinces(m);
+                System.out.println(m3.toString());
+                getAirData(m3);
+                HashMap newHM = sortByElement(m3);
+                System.out.println(newHM);
+                //timer for every 6 hrs
+                Thread.sleep(60 * 60 * 6 * 1000);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
-        HashMap m = new HashMap (getProvinceMap());
-        HashMap m3 = getListOfDataFromProvinces(m);
-        System.out.println(m3.toString());
-        getAirData(m3);
-        System.out.println(m3.toString());
-        HashMap newHM = sortByElement(m3);
+        timeLoop();
     }
 
 }
