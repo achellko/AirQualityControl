@@ -217,6 +217,11 @@ public class AirData {
         return provinceStations;
     }
 
+    /**
+     * function counts average value of element from list of values
+     * @param map of element and list of it`s values
+     * @return map with key - "element" and value - average value
+     */
     private static HashMap<String, String> countAvg(HashMap<String, ArrayList> map){
         ArrayList listOfValues;
         HashMap newMap = new HashMap();
@@ -235,41 +240,48 @@ public class AirData {
         return newMap;
     }
 
+    /**
+     * function sort list of air elements from different stations for every province
+     * @param listOfStations map where key is province and value is list of elements from different stations
+     *                       from this province
+     * @return map with key - "province" and value - list of elements with actual values
+     * from province
+     */
     private static  HashMap<String, HashMap> sortByElement(HashMap<String, ArrayList> listOfStations) {
-        ArrayList a = new ArrayList<>(listOfStations.values());
-        HashMap<String, HashMap> newMap = new HashMap<>();
-        Set s = new HashSet();
+        ArrayList listOfElements = new ArrayList<>(listOfStations.values());
+        HashMap<String, HashMap> sortedMap = new HashMap<>();
+        Set setOfValues = new HashSet();
         int count = 0;
         ArrayList province = new ArrayList(listOfStations.keySet());
-        ArrayList l;
+        ArrayList listOfValues;
         HashMap<String, ArrayList> duplicates = new HashMap<>();
-        ArrayList duplicateValues = new ArrayList();
-        for (Object o : a) {
-            l = new ArrayList((ArrayList)o);
-            for (Object oo : l) {
-                HashMap hh = (HashMap)oo;
-                for (Object key : hh.keySet()) {
-                    if (!s.add(key.toString())) {
-                        if(hh.get(key)!="") {
-                            ArrayList al = (ArrayList) duplicates.get(key.toString()).clone();
-                            al.add(hh.get(key));
-                            duplicates.put(key.toString(), al);
+
+        for (Object o : listOfElements) {
+            listOfValues = new ArrayList((ArrayList)o);
+            for (Object mapOfElements : listOfValues) {
+                HashMap mapOfValues = (HashMap)mapOfElements;
+                for (Object key : mapOfValues.keySet()) {
+                    if (!setOfValues.add(key.toString())) {
+                        if(mapOfValues.get(key)!="") {
+                            ArrayList tmp2 = (ArrayList) duplicates.get(key.toString()).clone();
+                            tmp2.add(mapOfValues.get(key));
+                            duplicates.put(key.toString(), tmp2);
                         }
                     } else {
-                        if(hh.get(key)!= "") {
-                            ArrayList tmp = new ArrayList();
-                            tmp.add(hh.get(key));
-                            duplicates.put(key.toString(), tmp);
+                        if(mapOfValues.get(key)!= "") {
+                            ArrayList tmp1 = new ArrayList();
+                            tmp1.add(mapOfValues.get(key));
+                            duplicates.put(key.toString(), tmp1);
                         }
                     }
                 }
             }
-            newMap.put(province.get(count).toString(),countAvg(duplicates));
+            sortedMap.put(province.get(count).toString(),countAvg(duplicates));
             count++;
-            s.clear();
+            setOfValues.clear();
             duplicates.clear();
         }
-        return newMap;
+        return sortedMap;
     }
 
     /**
