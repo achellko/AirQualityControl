@@ -3,16 +3,39 @@ import org.json.simple.JSONObject;
 import java.util.*;
 
 public class Data {
-    private static JSON json = new JSON();
-    private static String stationURL = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/";
-    private static String airDataURL = "http://api.gios.gov.pl/pjp-api/rest/data/getData/";
+    private JSON json = new JSON();
+    private Sort sort = new Sort();
+
+    private String provinceURL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";
+    private String stationURL = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/";
+    private String airDataURL = "http://api.gios.gov.pl/pjp-api/rest/data/getData/";
+
+    /**
+     * function takes data from GIOS API with Poland provinces and list of their stations
+     * @return map with key "province" and value with list of id`s from their stations
+     */
+    public Map<String, List<String>> getProvinceMap() {
+        HashMap<String, String> stationMap = new HashMap<>();
+        JSONArray a = json.getJSON(provinceURL);
+
+        // Loop through each item
+        for (Object o : a) {
+            JSONObject json = (JSONObject) o;
+            JSONObject city = (JSONObject) json.get("city");
+            JSONObject commune = (JSONObject) city.get("commune");
+
+            stationMap.put(json.get("id").toString(), commune.get("provinceName").toString());
+        }
+        Map<String, List<String>> provinceMap = sort.sortByProvince(stationMap);
+        return provinceMap;
+    }
 
     /**
      * function gets the latest value of element form GIOS API
      * @param index of element
      * @return value of element
      */
-    private static String getValueFromURL(String index){
+    private String getValueFromURL(String index){
         index = airDataURL+index;
         String result = new String ();
         int i = 0;
@@ -43,7 +66,7 @@ public class Data {
      * @param stationNumber id of station
      * @return map with key - "element name" and value - id of this element
      */
-    private static HashMap<String, String> getDataID(String stationNumber) {
+    private HashMap<String, String> getDataID(String stationNumber) {
         String airURL = stationURL+stationNumber;
         HashMap<String, String> stationAirData = new HashMap<>();
         JSONArray a = json.getJSON(airURL);
@@ -62,7 +85,7 @@ public class Data {
      * @param index map of elements and their id`s from GIOS API
      * @return map where id of element is rewrote to it`s actual value (taken from API)
      */
-    private static HashMap getData(HashMap index) {
+    private HashMap getData(HashMap index) {
         HashMap data = new HashMap();
         for (Object key : index.keySet()) {
             String keyStr = index.get(key).toString();
