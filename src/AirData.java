@@ -16,12 +16,13 @@ public class AirData {
         //output: {ŚWIĘTOKRZYSKIE=[{NO2=5083, O3=14878, SO2=5087, PM10=5085}
         // PROVINCE name + lists of elements and their id`s
 
-        data.getAirData(m);
-        System.out.println(m.toString());
-        //output: {ŚWIĘTOKRZYSKIE=[{NO2=7.0, O3=91.84, SO2=9.73, PM10=29.25}
-        // PROVINCE name + lists of element values from all stations
         try {
             while (true) {
+                data.getAirData(m);
+                System.out.println(m.toString());
+                //output: {ŚWIĘTOKRZYSKIE=[{NO2=7.0, O3=91.84, SO2=9.73, PM10=29.25}
+                // PROVINCE name + lists of element values from all stations
+
                 HashMap newHM = sort.sortByElement(m);
                 System.out.println(newHM);
                 //output: ŚWIĘTOKRZYSKIE={NO2=4.2, O3=114.78, PM2.5=3.78, SO2=3.84, PM10=10.0, CO=216.67, C6H6=0.08}
