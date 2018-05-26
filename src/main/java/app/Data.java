@@ -1,22 +1,37 @@
+package app;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import java.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+@Component("data")
 public class Data {
-    private JSON json = new JSON();
-    private Sort sort = new Sort();
-    private Quality quality = new Quality();
+    private JSON json;
+    private Sort sort;
+    private Quality quality;
 
     private String provinceURL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";
     private String stationURL = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/";
     private String airDataURL = "http://api.gios.gov.pl/pjp-api/rest/data/getData/";
+
+    @Autowired
+    public Data(JSON json, Sort sort, Quality quality) {
+        this.json = json;
+        this.sort = sort;
+        this.quality = quality;
+    }
 
     /**
      * function takes data from GIOS API with Poland provinces and list of their stations
      * @return map with key "province" and value with list of id`s from their stations
      */
     public HashMap<String, List<String>> getProvinceMap() {
-        HashMap<String, String> stationMap = new HashMap<>();
+        HashMap<String, String> stationMap = new HashMap<String, String>();
         JSONArray a = json.getJSON(provinceURL);
 
         // Loop through each item
@@ -69,7 +84,7 @@ public class Data {
      */
     private HashMap<String, String> getDataID(String stationNumber) {
         String airURL = stationURL+stationNumber;
-        HashMap<String, String> stationAirData = new HashMap<>();
+        HashMap<String, String> stationAirData = new HashMap<String, String>();
         JSONArray a = json.getJSON(airURL);
 
         // Loop through each item
@@ -101,7 +116,7 @@ public class Data {
      * @param provinceMap map of provinces with list of their parameters from every station
      */
     public void getAirData(HashMap<String, ArrayList> provinceMap){
-        ArrayList<HashMap> listOfMaps = new ArrayList<>();
+        ArrayList<HashMap> listOfMaps = new ArrayList<HashMap>();
         for (Object key : provinceMap.keySet()){
             Object listOfData = provinceMap.get(key);
             for (int i = 0; i < ((ArrayList) listOfData).size(); i++) {
@@ -120,8 +135,8 @@ public class Data {
      * @return new map, in which list of id`s is changed to list of data from every station
      */
     public  HashMap<String, ArrayList> getListOfDataFromProvinces(HashMap provinceMap){
-        ArrayList<HashMap> listOfMaps = new ArrayList<>();
-        HashMap<String, ArrayList> provinceStations = new HashMap<>();
+        ArrayList<HashMap> listOfMaps = new ArrayList<HashMap>();
+        HashMap<String, ArrayList> provinceStations = new HashMap<String, ArrayList>();
         for (Object key : provinceMap.keySet()) {
             Object listOfStations = provinceMap.get(key);
             for (int i = 0; i < ((ArrayList) listOfStations).size(); i++) {

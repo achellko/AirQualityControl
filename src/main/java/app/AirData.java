@@ -1,15 +1,28 @@
-import java.util.*;
+package app;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+
+@Component("airData")
 public class AirData {
 
-    private static Sort sort = new Sort();
-    private static Quality quality = new Quality();
-    private static Data data = new Data();
+    private Sort sort;
+    private Quality quality;
+    private Data data;
+
+    @Autowired
+    public AirData(Sort sort, Quality quality, Data data) {
+        this.sort = sort;
+        this.quality = quality;
+        this.data = data;
+    }
 
     /**
      * loop that takes data from API every 6 hours (4 times a day)
      */
-    private static void timeLoop(){
+    public void timeLoop(){
         HashMap m = new HashMap (data.getProvinceMap());
         m = data.getListOfDataFromProvinces(m);
         System.out.println(m.toString());
@@ -40,10 +53,6 @@ public class AirData {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        timeLoop();
     }
 
 }

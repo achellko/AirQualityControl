@@ -1,5 +1,10 @@
+package app;
+
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
+@Component("sort")
 public class Sort {
 
     /**
@@ -9,11 +14,11 @@ public class Sort {
      * @return sorted map with key - "province" and value - list of stations
      */
     public HashMap<String, List<String>> sortByProvince(HashMap<String,String> stationMap){
-        Set<String> provinceSet = new HashSet<>(stationMap.values());
-        Map<String, List<String>> provinceMap = new HashMap<>();
+        Set<String> provinceSet = new HashSet<String>(stationMap.values());
+        Map<String, List<String>> provinceMap = new HashMap<String, List<String>>();
 
         for (String s : provinceSet) {
-            List<String> IdList = new ArrayList<>();
+            List<String> IdList = new ArrayList<String>();
             for (HashMap.Entry<String ,String> entry : stationMap.entrySet()) {
                 if (entry.getValue().equals(s)){
                     IdList.add(entry.getKey());
@@ -32,13 +37,13 @@ public class Sort {
      * from province
      */
     public  HashMap<String, HashMap> sortByElement(HashMap<String, ArrayList> listOfStations) {
-        ArrayList listOfElements = new ArrayList<>(listOfStations.values());
-        HashMap<String, HashMap> sortedMap = new HashMap<>();
+        ArrayList listOfElements = new ArrayList(listOfStations.values());
+        HashMap<String, HashMap> sortedMap = new HashMap<String, HashMap>();
         Set setOfValues = new HashSet();
         int count = 0;
         ArrayList province = new ArrayList(listOfStations.keySet());
         ArrayList listOfValues;
-        HashMap<String, ArrayList> duplicates = new HashMap<>();
+        HashMap<String, ArrayList> duplicates = new HashMap<String, ArrayList>();
 
         for (Object o : listOfElements) {
             listOfValues = new ArrayList((ArrayList)o);

@@ -1,5 +1,10 @@
+package app;
+
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 
+@Component("quality")
 public class Quality {
 
     /**
