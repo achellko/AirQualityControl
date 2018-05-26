@@ -5,6 +5,7 @@ import java.util.*;
 public class Data {
     private JSON json = new JSON();
     private Sort sort = new Sort();
+    private Quality quality = new Quality();
 
     private String provinceURL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";
     private String stationURL = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/";
@@ -14,7 +15,7 @@ public class Data {
      * function takes data from GIOS API with Poland provinces and list of their stations
      * @return map with key "province" and value with list of id`s from their stations
      */
-    public Map<String, List<String>> getProvinceMap() {
+    public HashMap<String, List<String>> getProvinceMap() {
         HashMap<String, String> stationMap = new HashMap<>();
         JSONArray a = json.getJSON(provinceURL);
 
@@ -26,7 +27,7 @@ public class Data {
 
             stationMap.put(json.get("id").toString(), commune.get("provinceName").toString());
         }
-        Map<String, List<String>> provinceMap = sort.sortByProvince(stationMap);
+        HashMap<String, List<String>> provinceMap = sort.sortByProvince(stationMap);
         return provinceMap;
     }
 
@@ -131,5 +132,23 @@ public class Data {
             listOfMaps.clear();
         }
         return provinceStations;
+    }
+
+    /**
+     * function gets air information for province on demand
+     * @param province name
+     * @return air wuality status
+     */
+    public String getProvinceAirQualityOnDemand(String province) {
+        province = province.toUpperCase();
+        HashMap provinceMap = getProvinceMap();
+        HashMap provinceOnDemand = new HashMap();
+        provinceOnDemand.put(province,provinceMap.get(province));
+        provinceOnDemand = getListOfDataFromProvinces(provinceOnDemand);
+        getAirData(provinceOnDemand);
+        provinceOnDemand = sort.sortByElement(provinceOnDemand);
+        provinceOnDemand = quality.getAirQuality(provinceOnDemand);
+
+        return provinceOnDemand.get(province).toString();
     }
 }
