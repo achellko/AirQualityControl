@@ -2,7 +2,6 @@ package app;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 
 @Component("airData")
@@ -23,18 +22,19 @@ public class AirData {
      * loop that takes data from API every 6 hours (4 times a day)
      */
     public void timeLoop(){
-        HashMap m = new HashMap (data.getProvinceMap());
-        m = data.getListOfDataFromProvinces(m);
-        System.out.println(m.toString());
-        //output: {ŚWIĘTOKRZYSKIE=[{NO2=5083, O3=14878, SO2=5087, PM10=5085}
-        // PROVINCE name + lists of elements and their id`s
-
         try {
             while (true) {
+                HashMap m = new HashMap (data.getProvinceMap());
+                m = data.getListOfDataFromProvinces(m);
+                System.out.println(m.toString());
+                //output: {ŚWIĘTOKRZYSKIE=[{NO2=5083, O3=14878, SO2=5087, PM10=5085}
+                // PROVINCE name + lists of elements and their id`s
+
                 data.getAirData(m);
                 System.out.println(m.toString());
                 //output: {ŚWIĘTOKRZYSKIE=[{NO2=7.0, O3=91.84, SO2=9.73, PM10=29.25}
                 // PROVINCE name + lists of element values from all stations
+
 
                 HashMap newHM = sort.sortByElement(m);
                 System.out.println(newHM);
@@ -48,7 +48,8 @@ public class AirData {
                 System.out.println("Air quality for province "+"świętokrzyskie "+"is: "+data.getProvinceAirQualityOnDemand("ŚWIĘTOKRZYSKIE"));
 
                 //timer for every 6 hrs
-                Thread.sleep(60 * 60 * 6 * 1000);
+                Thread.sleep(60*60*1000);
+                //Thread.sleep(60 * 60 * 6 * 1000);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
